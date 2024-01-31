@@ -1,6 +1,5 @@
 {
-  "package": "de.erdbeerbaerlp.dcintegration.forge.mixin",
-  "refmap": "mixins.dcintegration.refmap.json",
+  "package": "de.erdbeerbaerlp.dcintegration.neoforge.mixin",
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_11",
   "server": [

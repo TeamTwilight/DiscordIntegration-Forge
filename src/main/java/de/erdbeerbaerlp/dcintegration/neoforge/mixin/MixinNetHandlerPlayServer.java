@@ -1,6 +1,6 @@
-package de.erdbeerbaerlp.dcintegration.forge.mixin;
+package de.erdbeerbaerlp.dcintegration.neoforge.mixin;
 
-import de.erdbeerbaerlp.dcintegration.forge.DiscordIntegrationMod;
+import de.erdbeerbaerlp.dcintegration.neoforge.DiscordIntegrationMod;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;

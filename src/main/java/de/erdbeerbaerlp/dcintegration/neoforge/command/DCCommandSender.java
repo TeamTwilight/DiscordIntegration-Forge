@@ -1,4 +1,4 @@
-package de.erdbeerbaerlp.dcintegration.forge.command;
+package de.erdbeerbaerlp.dcintegration.neoforge.command;
 
 import de.erdbeerbaerlp.dcintegration.common.DiscordIntegration;
 import de.erdbeerbaerlp.dcintegration.common.storage.Localization;
@@ -17,7 +17,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.concurrent.CompletableFuture;
 

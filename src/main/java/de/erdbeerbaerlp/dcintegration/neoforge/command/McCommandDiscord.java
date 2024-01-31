@@ -1,4 +1,4 @@
-package de.erdbeerbaerlp.dcintegration.forge.command;
+package de.erdbeerbaerlp.dcintegration.neoforge.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;

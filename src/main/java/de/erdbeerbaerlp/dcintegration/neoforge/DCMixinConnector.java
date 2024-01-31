@@ -1,4 +1,4 @@
-package de.erdbeerbaerlp.dcintegration.forge;
+package de.erdbeerbaerlp.dcintegration.neoforge;
 
 import org.spongepowered.asm.mixin.Mixins;
 import org.spongepowered.asm.mixin.connect.IMixinConnector;

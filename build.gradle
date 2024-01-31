@@ -1,173 +1,122 @@
-buildscript {
-    repositories {
-        mavenCentral()
-        maven { url = "https://files.minecraftforge.net/maven" }
-        maven {
-            name = 'sponge'
-            url = 'https://repo.spongepowered.org/maven'
-        }
-        maven {
-                url "https://plugins.gradle.org/m2/"
-        }
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
-    }
-}
-
-//Gradle Plugins
 plugins {
     id "com.matthewprenger.cursegradle" version "1.4.0"
     id 'java'
+    id 'eclipse'
+    id 'idea'
     id "com.modrinth.minotaur" version "2.+"
-    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'maven-publish'
+    id 'net.neoforged.gradle.userdev' version '7.0.+'
+    id 'net.neoforged.gradle.mixin' version '7.0.+'
 }
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
-apply plugin: 'org.spongepowered.mixin'
 
+configurations {
+    shade
+}
+
+shadowJar {
+    archiveClassifier.set('')
+    configurations = [project.configurations.shade]
+    relocate 'org.slf4j', 'dcshadow.org.slf4j'
+}
 
 //Build variables
 version = "3.0.5"
 group = "de.erdbeerbaerlp.dcintegration"
-archivesBaseName = "dcintegration-forge"
+archivesBaseName = "dcintegration-neoforge"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 //Gradle Repositories
 repositories {
     maven { url 'https://jitpack.io' }
-    maven {
-        name = 'sponge'
-        url = 'https://repo.spongepowered.org/maven'
-    }
-    maven { url "https://nexus.vankka.dev/repository/maven-public/" }
-    maven { url "https://repository.dev.gotan.io/repository/gotan.os/" }
-    maven { url "https://repo.opencollab.dev/maven-snapshots" }
-    maven { url "https://repo.opencollab.dev/maven-releases" }
-    maven {
-        name = 'sonatype-oss'
-        url = 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
-    flatDir {
-        dirs 'libs'
-    }
     maven { url "https://repo.erdbeerbaerlp.de/repository/maven-public/" }
 }
 
-//Forge
-minecraft {
-    mappings channel: 'official', version: "${project.mcVersion}"
-}
-
-
-//ShadowJar
-configurations {
-    embed
-    minecraftLibrary.extendsFrom(embed)
-}
-task release {
-
-}
-
-shadowJar {
-    archiveClassifier = "${project.mcVersion}"
-    configurations = [project.configurations.embed]
-    relocate 'org.slf4j', 'dcshadow.org.slf4j'
-}
-reobf {
-    shadowJar {
-        dependsOn tasks.createMcpToSrg
-        mappings = tasks.createMcpToSrg.outputs.files.singleFile
-    }
-}
-artifacts {
-    archives tasks.shadowJar
-}
-configurations.all {
-    resolutionStrategy {
-        cacheChangingModulesFor 1, 'minutes'
-    }
-}
-//Dependencies
-dependencies {
-    // =========  Common  =====================
-    embed('de.erdbeerbaerlp:dcintegration.common:3.0.5') {
-        changing = true
-        transitive = false
-    }
-
-    // =========  Minecraft Forge =============
-    minecraft "net.minecraftforge:forge:${project.mcVersion}-49.0.9"
-
-    //Mixin
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-
-    //Dynmap-API
-    compileOnly('com.github.webbukkit:DynmapCoreAPI:2.5')
-}
-
-
-//Mixin
 mixin {
-    add sourceSets.main, 'mixins.dcintegration.refmap.json'
+    // add sourceSets.main, 'mixins.dcintegration.refmap.json' Neoforged no longer needs refmapping
     config 'mixins.dcintegration.json'
 }
 
-//Manifest attributes
-jar {
-    archiveClassifier = "${project.mcVersion}"
-    manifest {
-        attributes([
-                'Maven-Artifact'          : "${project.group}:${project.archivesBaseName}:${project.version}",
-                'Timestamp'               : System.currentTimeMillis(),
-                "Specification-Title"     : "dcintegration",
-                "Specification-Vendor"    : "dcintegration",
-                "Specification-Version"   : "1", // We are version 1 of ourselves
-                "Implementation-Title"    : project.name,
-                "Implementation-Version"  : "${project.version}",
-                "Implementation-Vendor"   : "dcintegration",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                'MixinConnector'          : 'de.erdbeerbaerlp.dcintegration.forge.DCMixinConnector'
-        ])
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+artifacts {
+    archives tasks.shadowJar
+}
+
+runs {
+    // applies to all the run configs below
+    configureEach {
+        // Recommended logging data for a userdev environment
+        // The markers can be added/remove as needed separated by commas.
+        // "SCAN": For mods scan.
+        // "REGISTRIES": For firing of registry events.
+        // "REGISTRYDUMP": For getting the contents of all registries.
+        systemProperty 'forge.logging.markers', 'REGISTRIES'
+
+        // Recommended logging level for the console
+        // You can set various levels here.
+        // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
+        systemProperty 'forge.logging.console.level', 'debug'
+
+        modSource project.sourceSets.main
+    }
+
+    client {
+        workingDirectory project.file('run/client')
+        // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
+        systemProperty 'forge.enabledGameTestNamespaces', 'dcintegration'
+    }
+
+    server {
+        workingDirectory project.file('run/server')
+        systemProperty 'forge.enabledGameTestNamespaces', 'dcintegration'
+        programArgument '--nogui'
+    }
+
+    // This run config launches GameTestServer and runs all registered gametests, then exits.
+    // By default, the server will crash when no gametests are provided.
+    // The gametest system is also enabled by default for other run configs under the /test command.
+    gameTestServer {
+        workingDirectory project.file('run/gamedata')
+        systemProperty 'forge.enabledGameTestNamespaces', 'dcintegration'
+    }
+
+    data {
+        // example of overriding the workingDirectory set in configureEach above, uncomment if you want to use it
+        workingDirectory project.file('run/data')
+
+        // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
+        programArguments.addAll '--mod', 'dcintegration', '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
     }
 }
 
-//Curseforge publishing
-curseforge {
-    if (project.hasProperty('curseforge.apikey')) { // $GRADLE_USER_HOME/gradle.properties
-        apiKey = getProperty("curseforge.apikey")
-        project {
-            id = '324952'
-            changelog = project.changelog
-            releaseType = project.releaseType.toLowerCase()
-            addGameVersion "${project.mcVersion}"
-            mainArtifact(jar) {
-                displayName = "DiscordIntegration-Forge $version (MC ${project.mcVersion})"
-            }
-            relations {
-                optionalDependency("luckperms")
-            }
-        }
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+//Dependencies
+dependencies {
+    // =========  Minecraft Forge =============
+    implementation "net.neoforged:neoforge:20.4.146-beta"
+
+    //Dynmap-API
+    compileOnly('com.github.webbukkit:DynmapCoreAPI:2.5')
+
+    // =========  Common  =====================
+    def dciCommon = 'de.erdbeerbaerlp:dcintegration.common:3.0.5'
+    implementation(dciCommon) {
+        transitive = false
     }
-}
-modrinth {
-    if (project.hasProperty('modrinth.apikey')) { // $GRADLE_USER_HOME/gradle.properties
-        token = getProperty("modrinth.apikey") // Use an environment property!
-        projectId = 'rbJ7eS5V'
-        versionNumber = version + "-${project.mcVersion}"
-        versionName = "DiscordIntegration-Forge $version (MC ${project.mcVersion})"
-        uploadFile = shadowJar
-        changelog = project.changelog
-        gameVersions = ["${project.mcVersion}"]
-        loaders = ['forge']
-        versionType = project.releaseType.toUpperCase()
-        dependencies {
-            optional.project "luckperms"
-        }
-    }
+    shade dciCommon
 }
 
-tasks.release.dependsOn(tasks.build, tasks.curseforge, tasks.modrinth)
+tasks.register('sourceJar', Jar) {
+    dependsOn 'classes'
+    from sourceSets.main.allSource
+    archiveClassifier = 'sources'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+build.dependsOn shadowJar

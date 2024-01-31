@@ -1,4 +1,4 @@
-package de.erdbeerbaerlp.dcintegration.forge.util;
+package de.erdbeerbaerlp.dcintegration.neoforge.util;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -18,8 +18,8 @@ import de.erdbeerbaerlp.dcintegration.common.storage.linking.LinkManager;
 import de.erdbeerbaerlp.dcintegration.common.util.ComponentUtils;
 import de.erdbeerbaerlp.dcintegration.common.util.McServerInterface;
 import de.erdbeerbaerlp.dcintegration.common.util.MinecraftPermission;
-import de.erdbeerbaerlp.dcintegration.forge.DiscordIntegrationMod;
-import de.erdbeerbaerlp.dcintegration.forge.command.DCCommandSender;
+import de.erdbeerbaerlp.dcintegration.neoforge.DiscordIntegrationMod;
+import de.erdbeerbaerlp.dcintegration.neoforge.command.DCCommandSender;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
@@ -32,8 +32,8 @@ import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraftforge.server.ServerLifecycleHooks;
-import net.minecraftforge.server.permission.PermissionAPI;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.permission.PermissionAPI;
 
 import java.util.HashMap;
 import java.util.List;

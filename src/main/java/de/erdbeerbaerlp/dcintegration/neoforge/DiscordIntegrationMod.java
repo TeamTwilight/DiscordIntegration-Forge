@@ -1,4 +1,4 @@
-package de.erdbeerbaerlp.dcintegration.forge;
+package de.erdbeerbaerlp.dcintegration.neoforge;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -16,10 +16,10 @@ import de.erdbeerbaerlp.dcintegration.common.storage.Configuration;
 import de.erdbeerbaerlp.dcintegration.common.storage.Localization;
 import de.erdbeerbaerlp.dcintegration.common.storage.linking.LinkManager;
 import de.erdbeerbaerlp.dcintegration.common.util.*;
-import de.erdbeerbaerlp.dcintegration.forge.api.ForgeDiscordEventHandler;
-import de.erdbeerbaerlp.dcintegration.forge.command.McCommandDiscord;
-import de.erdbeerbaerlp.dcintegration.forge.util.ForgeMessageUtils;
-import de.erdbeerbaerlp.dcintegration.forge.util.ForgeServerInterface;
+import de.erdbeerbaerlp.dcintegration.neoforge.api.ForgeDiscordEventHandler;
+import de.erdbeerbaerlp.dcintegration.neoforge.command.McCommandDiscord;
+import de.erdbeerbaerlp.dcintegration.neoforge.util.ForgeMessageUtils;
+import de.erdbeerbaerlp.dcintegration.neoforge.util.ForgeServerInterface;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -34,27 +34,27 @@ import net.minecraft.commands.arguments.ComponentArgument;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.CommandEvent;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.ServerChatEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.player.AdvancementEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.server.ServerStartedEvent;
-import net.minecraftforge.event.server.ServerStoppedEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.IExtensionPoint;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.server.permission.events.PermissionGatherEvent;
-import net.minecraftforge.server.permission.nodes.PermissionNode;
-import net.minecraftforge.server.permission.nodes.PermissionTypes;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.IExtensionPoint;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.CommandEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.ServerChatEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.player.AdvancementEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.neoforge.server.permission.events.PermissionGatherEvent;
+import net.neoforged.neoforge.server.permission.nodes.PermissionNode;
+import net.neoforged.neoforge.server.permission.nodes.PermissionTypes;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.File;
@@ -78,7 +78,19 @@ public class DiscordIntegrationMod {
     public static final ArrayList<UUID> timeouts = new ArrayList<>();
     private boolean stopped = false;
 
-    public DiscordIntegrationMod() {
+    public DiscordIntegrationMod(IEventBus modEventBus) {
+        String[] touchGrass = new String[] {
+                "de.erdbeerbaerlp.dcintegration.forge.util.ForgeServerInterface",
+                "net.dv8tion.jda.api.EmbedBuilder"
+        };
+        for (String clazz : touchGrass) {
+            try {
+                LOGGER.info("Class " + clazz + " found " + Class.forName(clazz).getName());
+            } catch (Throwable t) {
+                LOGGER.info("Class " + clazz + " cannot be found", t);
+            }
+        }
+
         LOGGER.info("Version is " + VERSION);
         ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> IExtensionPoint.DisplayTest.IGNORESERVERONLY, (a, b) -> true));
         try {
@@ -91,8 +103,8 @@ public class DiscordIntegrationMod {
                 if (Configuration.instance().general.botToken.equals("INSERT BOT TOKEN HERE")) { //Prevent events when token not set or on client
                     LOGGER.error("Please check the config file and set an bot token");
                 } else {
-                    FMLJavaModLoadingContext.get().getModEventBus().addListener(this::serverSetup);
-                    MinecraftForge.EVENT_BUS.register(this);
+                    modEventBus.addListener(this::serverSetup);
+                    NeoForge.EVENT_BUS.register(this);
                 }
             }
         } catch (IOException e) {

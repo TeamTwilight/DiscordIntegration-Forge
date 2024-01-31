@@ -1,4 +1,4 @@
-package de.erdbeerbaerlp.dcintegration.forge.mixin;
+package de.erdbeerbaerlp.dcintegration.neoforge.mixin;
 
 import com.mojang.authlib.GameProfile;
 import de.erdbeerbaerlp.dcintegration.common.DiscordIntegration;
@@ -8,7 +8,7 @@ import de.erdbeerbaerlp.dcintegration.common.storage.linking.LinkManager;
 import de.erdbeerbaerlp.dcintegration.common.util.MinecraftPermission;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.players.PlayerList;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

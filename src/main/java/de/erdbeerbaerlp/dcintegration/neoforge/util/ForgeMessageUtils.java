@@ -1,4 +1,4 @@
-package de.erdbeerbaerlp.dcintegration.forge.util;
+package de.erdbeerbaerlp.dcintegration.neoforge.util;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -14,6 +14,8 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.arguments.ComponentArgument;
 import net.minecraft.commands.arguments.NbtTagArgument;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -23,8 +25,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -32,7 +32,7 @@ import java.util.UUID;
 
 public class ForgeMessageUtils extends MessageUtils {
 
-    private static final IForgeRegistry<Item> itemreg = ForgeRegistries.ITEMS;
+    private static final Registry<Item> itemreg = BuiltInRegistries.ITEM;
 
     public static String formatPlayerName(Map.Entry<UUID, String> p) {
         return formatPlayerName(p, true);
@@ -61,7 +61,7 @@ public class ForgeMessageUtils extends MessageUtils {
                             if (hoverEvent.getAsJsonObject("contents").has("tag")) {
                                 final JsonObject item = hoverEvent.getAsJsonObject("contents").getAsJsonObject();
                                 try {
-                                    final ItemStack is = new ItemStack(itemreg.getValue(new ResourceLocation(item.get("id").getAsString())));
+                                    final ItemStack is = new ItemStack(itemreg.get(new ResourceLocation(item.get("id").getAsString())));
                                     if (item.has("tag")) {
                                         final CompoundTag tag = (CompoundTag) NbtTagArgument.nbtTag().parse(new StringReader(item.get("tag").getAsString()));
                                         is.setTag(tag);
