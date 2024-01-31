@@ -79,18 +79,6 @@ public class DiscordIntegrationMod {
     private boolean stopped = false;
 
     public DiscordIntegrationMod(IEventBus modEventBus) {
-        String[] touchGrass = new String[] {
-                "de.erdbeerbaerlp.dcintegration.forge.util.ForgeServerInterface",
-                "net.dv8tion.jda.api.EmbedBuilder"
-        };
-        for (String clazz : touchGrass) {
-            try {
-                LOGGER.info("Class " + clazz + " found " + Class.forName(clazz).getName());
-            } catch (Throwable t) {
-                LOGGER.info("Class " + clazz + " cannot be found", t);
-            }
-        }
-
         LOGGER.info("Version is " + VERSION);
         ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> IExtensionPoint.DisplayTest.IGNORESERVERONLY, (a, b) -> true));
         try {
