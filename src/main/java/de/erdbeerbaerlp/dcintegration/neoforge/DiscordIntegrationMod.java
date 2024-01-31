@@ -108,7 +108,6 @@ public class DiscordIntegrationMod {
         }
     }
 
-    @SubscribeEvent
     public void serverSetup(FMLDedicatedServerSetupEvent ev) {
         INSTANCE = new DiscordIntegration(new ForgeServerInterface());
         try {
